@@ -7,7 +7,29 @@ class MoviesController < ApplicationController
   end
 
   def index
-    @movies = Movie.all
+    @all_ratings = Movie.ratings
+#  @all_ratings = ["G", "PG", "PG-13", "R"]
+    ratings = @all_ratings
+    if params[:ratings]
+       ratings = params[:ratings].keys
+       @checkboxes = params[:ratings]
+       session[:ratings] = params[:ratings]
+    elsif session[:ratings] && params[:ratings] == nil
+       params[:ratings] = session[:ratings]
+       flash.keep
+       redirect_to movies_path params
+    else
+       @checkboxes = @all_ratings
+    end
+    if params[:order] == "title"
+      @movies = Movie.find(:all, :conditions => {:rating => ratings}, :order => "lower(title) ASC")
+      @hilite = "title"
+    else
+      if params[:order] == "release_date"
+        @hilite = "date"
+      end
+      @movies = Movie.find(:all, :order => params[:order], :conditions => {:rating => ratings})
+    end
   end
 
   def new

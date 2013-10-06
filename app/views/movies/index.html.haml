@@ -3,10 +3,16 @@
 
 %table#movies
   %thead
+    = form_tag movies_path, :method => :get do
+      Include: 
+      - @all_ratings.each do |rating|
+        = rating
+        = check_box_tag "ratings[#{rating}]", "1", @checkboxes.include?(rating)
+      = submit_tag 'Refresh'
     %tr
-      %th Movie Title
+      %th#title_header{:class => ("hilite" if @hilite == "title")}= link_to "Movie Title", movies_path({:order => "title", :ratings => @checkboxes})
       %th Rating
-      %th Release Date
+      %th#release_date_header{:class => ("hilite" if @hilite == "date")}= link_to "Release Date", movies_path({:order => "release_date", :ratings => @checkboxes})
       %th More Info
   %tbody
     - @movies.each do |movie|
